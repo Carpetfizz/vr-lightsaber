@@ -1,10 +1,25 @@
 /*
+	
+	2015 - Ajay Ramesh
+	ajayramesh@berkeley.edu
+	ajayramesh.com
+	@carpetfizz
+
 	debug shit to remove:
 		- server.js "drake"
-		- document.ready init, render, move back to calibrationcomplete
 		- stereo renderer
+		- controls update for isMobile
+		- Click for full screen
+		- Confirm button click
 	ngrok
-	http://stackoverflow.com/questions/22417324/rotating-on-multiple-axis-with-three-js
+
+	useful links:
+		- "What is Gimbal Lock and why does it occur?" http://www.anticz.com/eularqua.htm
+		- "Euler (gimbal lock) explained" https://www.youtube.com/watch?v=zc8b2Jo7mno
+		- "Rotation of Axes" http://www.stewartcalculus.com/data/CALCULUS%20Early%20Transcendentals/upfiles/RotationofAxes.pdf
+		- "W3C DeviceOrientation Event Spec" http://w3c.github.io/deviceorientation/spec-source-orientation.html
+		- "THREE.js Pivots" http://stackoverflow.com/questions/15214582/how-do-i-rotate-some-moons-around-a-planet-with-three-js
+		- "Detecting if Mobile Device" http://stackoverflow.com/a/24600597/896112 
 */
 
 var socket = io();
@@ -20,9 +35,11 @@ var scene,
 	textureLoader,
 	orbitControls,
 	controls,
+	container,
 	domElement,
 	hand,
 	cube,
+	lightsaber,
 	lightAngle,
 	lightScene,
 	floor;
@@ -30,6 +47,8 @@ var scene,
 if (/Mobi/.test(navigator.userAgent)) {
    	isMobile = true;
 }
+
+
 
 function init(){
 	width = window.innerWidth;
@@ -42,8 +61,9 @@ function init(){
 	textureLoader = new THREE.TextureLoader();
 	renderer.setSize( window.innerWidth, window.innerHeight);
 	camera.position.set(0, 15, 0);
-	camera.lookAt(new THREE.Vector3(0, 0, 0));
-
+	scene.add(camera);
+	
+	container = document.getElementById("container");
 	domElement = renderer.domElement;
 
 
@@ -64,26 +84,33 @@ function init(){
 	}
 
 	$('.room-id').hide();
-	document.body.appendChild(domElement);
+	$('.confirm-button').hide();
+	container.appendChild(domElement);
+	//domElement.addEventListener('click', fullscreen, false);
 	setupScene();
 }
 
 function setupScene(){
 	
 	/* HAND */
-	/*var handGeometry = new THREE.SphereGeometry(0.1, 32, 32 );
-	var handMaterial = new THREE.MeshBasicMaterial({color: 0xffff00});
+	var handGeometry = new THREE.SphereGeometry(1, 32, 32 );
+	var handMaterial = new THREE.MeshBasicMaterial({color: "#eac086"});
 	hand = new THREE.Mesh(handGeometry, handMaterial);
-	hand.position = camera.position;
-	hand.position.set(1, camera.position.y - 1, 0);*/
-
+	hand.position.set(10, 6, camera.position.z / 2);
+	scene.add(hand);
 
 	/* LIGHTSABER MODEL */
-	var geometry = new THREE.BoxGeometry(0.1, 2, 0.1);
-	var material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-	cube = new THREE.Mesh( geometry, material );
-	cube.position.set(1, 15, camera.position.z / 2);
-	scene.add(cube);
+	var lsGeometry = new THREE.CylinderGeometry(0.4, 0.04, 30, 20);
+	var lsMaterial = new THREE.MeshBasicMaterial({ color: "white" });
+	lightsaber = new THREE.Mesh( lsGeometry, lsMaterial );
+	lightsaber.position.setY(15);
+
+	var glowGeometry = new THREE.CylinderGeometry(0.5, 0.5, 30, 20);
+	var glowMaterial = new THREE.MeshBasicMaterial({transparent: true, opacity: 0.5, color: "#00FFFF" });
+	var glow = new THREE.Mesh(glowGeometry, glowMaterial);
+	lightsaber.add(glow);
+
+	hand.add(lightsaber);
 
 	/* LIGHTING */
 	lightAngle = new THREE.PointLight(0x999999, 2, 100);
@@ -118,9 +145,21 @@ function setupScene(){
 	scene.add(floor);
 
 	// AXIS 
-	var axis = new THREE.AxisHelper(75);
+	var axis = new THREE.AxisHelper(200);
     scene.add(axis); 
 
+}
+
+function fullscreen() {
+  if (container.requestFullscreen) {
+    container.requestFullscreen();
+  } else if (container.msRequestFullscreen) {
+    container.msRequestFullscreen();
+  } else if (container.mozRequestFullScreen) {
+    container.mozRequestFullScreen();
+  } else if (container.webkitRequestFullscreen) {
+    container.webkitRequestFullscreen();
+  }
 }
 
 function setOrientationControls(e){
@@ -130,14 +169,17 @@ function setOrientationControls(e){
   controls = new THREE.DeviceOrientationControls(camera, true);
   controls.connect();
   controls.update();
-  domElement.addEventListener('click', fullscreen, false);
   window.removeEventListener('deviceorientation', setOrientationControls, true);
 }
 
 window.addEventListener('deviceorientation', setOrientationControls, true);
 
+var oldAlpha = 0;
+
 /* UTILS */
 function setObjectQuat(object, data) {
+
+	console.log(data.a);
 
 	/* DEGREES to RADIANS */
 	var gammaRotation = data.g ? data.g * (Math.PI / 180): 0;
@@ -150,12 +192,22 @@ function setObjectQuat(object, data) {
 	gamma = gammaRotation;
 	alpha = alphaRotation;
 
-	if(betaRotation > 160 * (Math.PI / 180) || betaRotation < -90 * (Math.PI / 180)) {
-		beta = 160 * (Math.PI / 180);
-	}
+	// if(betaRotation > 160 * (Math.PI / 180) || betaRotation < -90 * (Math.PI / 180)) {
+	// 	beta = 160 * (Math.PI / 180);
+	// }
 
-	euler.set(0, -gamma, beta - Math.PI/2, 0);
+	/*
+		var x, z;
+		x = object.position.x;
+		z = object.position.z;
+		alpha*=0.01;
+		object.position.x = x * Math.cos(alpha) + z * Math.sin(alpha);
+		object.position.z = z * Math.cos(alpha) - x * Math.sin(alpha);
+	*/
+
 	
+	euler.set(0, -gamma, beta - Math.PI/2);
+
 	object.quaternion.setFromEuler(euler);
 
 }
@@ -182,6 +234,7 @@ function update(dt){
   resize();
   camera.updateProjectionMatrix();
   orbitControls.update(dt);
+
   if(isMobile) {
   	controls.update();
   }
@@ -196,6 +249,10 @@ function render(dt){
 }
 
 $(document).ready(function(){
+	/*$('.confirm-button').click(function(){
+		init();
+		animate();
+	});*/
 	init();
 	animate();
 });
@@ -204,20 +261,20 @@ $(document).ready(function(){
 
 socket.emit('viewerjoin', {room: roomId});
 
-socket.on('begincalibration', function(data){
+socket.on('beginsetup', function(data){
 	// change display
 });
 
-socket.on('calibrationcomplete', function(data){
-	// change display
-	// init();
-	// animate();
+socket.on('setupcomplete', function(data){
+	$('.confirm-button').show();
 	socket.emit('viewready');
 
 });
 
 socket.on('updateorientation', function(data){
-	setObjectQuat(cube, data);
+	if(hand){
+		setObjectQuat(hand, data);
+	}
 });
 
 socket.on('updatemotion', function(data){

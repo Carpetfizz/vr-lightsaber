@@ -61,15 +61,15 @@ io.on('connection', function (socket) {
 		socket.room = data.room;
 		socket.join(socket.room);
 
-		io.sockets.in(socket.room).emit('begincalibration');
+		io.sockets.in(socket.room).emit('beginsetup');
 
 		console.log("Lightsaber joined: "+socket.room);
 	});
 
-	socket.on('calibrationcomplete', function(data){
-		socket.broadcast.to(socket.room).emit('calibrationcomplete');
+	socket.on('setupcomplete', function(data){
+		socket.broadcast.to(socket.room).emit('setupcomplete');
 
-		console.log("Lightsaber calibration complete: "+socket.room);
+		console.log("Lightsaber setup complete: "+socket.room);
 	})
 
 	socket.on('viewready', function(data){

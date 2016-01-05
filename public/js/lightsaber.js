@@ -1,7 +1,6 @@
 var socket = io();
 
-var alpha, beta, gamma, original;
-original = document.getElementById("original");
+var alpha, beta, gamma;
 alpha = document.getElementById("alpha");
 beta = document.getElementById("beta");
 gamma = document.getElementById("gamma");
@@ -9,37 +8,41 @@ gamma = document.getElementById("gamma");
 
 socket.emit('lightsaberjoin', {room: roomId});
 
-socket.on('begincalibration', function(data){
+socket.on('beginsetup', function(data){
 	 window.addEventListener("compassneedscalibration", function(event) {
     	alert('Your compass needs calibrating!');
     	event.preventDefault();
     }, true);
-	socket.emit('calibrationcomplete');
+	socket.emit('setupcomplete');
 });
 
 socket.on('viewready', function(data){
 
-	var originalOrientation = {};
+	var originalAlpha = 0;
+	var freezeAlpha = false;
 	var oldOrientation = {};
 	var oldMotion = {};
 
-	originalOrientation.freeze = false;
-
 	if(window.DeviceOrientationEvent){
 		window.addEventListener('deviceorientation', function(e){
-			var orientation = {g: Math.round(e.gamma), b: Math.round(e.beta), a: Math.round(e.alpha), o: window.orientation || 0};
-			if(!originalOrientation.freeze){
-				originalOrientation = orientation;
-				originalOrientation.freeze = true;
-				original.innerHTML = String(orientation.a+", "+orientation.b+", "+orientation.g);
+			if(!freezeAlpha) {
+				originalAlpha = e.alpha;
+				freezeAlpha = true;
 			}
+			var orientation = {g: Math.round(e.gamma), b: Math.round(e.beta), a: Math.round(e.alpha), o: window.orientation || 0};
 			alpha.innerHTML = orientation.a;
 			beta.innerHTML = orientation.b;
 			gamma.innerHTML = orientation.g;
 			if(JSON.stringify(orientation) != JSON.stringify(oldOrientation)){
-				oldOrientation = orientation;
-				var calibratedOrientation = {g: orientation.g, b: orientation.b, a: orientation.a, o: orientation.o}
+				/*var a;
+				if(!oldOrientation.a) {
+					a = originalAlpha;
+				}else{
+					a = oldOrientation.a - orientation.a;
+				}
+				var calibratedOrientation = {g: orientation.g, b: orientation.b, a: a, o: orientation.o}*/
 				socket.emit('sendorientation', orientation);
+				oldOrientation = orientation;
 			}
 		});
 	}

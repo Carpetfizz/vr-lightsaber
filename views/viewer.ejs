@@ -26,11 +26,24 @@
 				height: 100%;
 				background-color: black;
 			}
+			.confirm-button {
+				width: 500px;
+				height: 100px;
+				color: white;
+				background-color: green;
+				display: none;
+			}
 		</style>
 	</head>
 	<body>
 		<div class="room-id">
 			<h2><%= room %></h2>
+		</div>
+		<div class="confirm-button">
+			Lightsaber connected!
+			Press this button and place your device inside Google Cardboard.
+		</div>
+		<div id="container">
 		</div>
 	</body>
 </html>
