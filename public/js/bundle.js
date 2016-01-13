@@ -1,3 +1,72 @@
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+function Enemy(){
+	var enemyGeometry = new THREE.SphereGeometry(2, 32, 32);
+	var enemyMaterial = new THREE.MeshBasicMaterial({color: "red"});
+	enemy = new THREE.Mesh(enemyGeometry, enemyMaterial);
+	return enemy;
+}
+
+module.exports = Enemy;
+},{}],2:[function(require,module,exports){
+function Floor(textureLoader, renderer) {
+
+	/* FLOOR */
+	// Floor Texture
+	var floorTexture = textureLoader.load( "/textures/floor_metal.jpg" );
+	floorTexture.wrapS = THREE.RepeatWrapping;
+	floorTexture.wrapT = THREE.RepeatWrapping;
+	floorTexture.repeat.set(75, 75);
+	floorTexture.anisotropy = renderer.getMaxAnisotropy();
+
+	// Floor Material
+	var floorMaterial = new THREE.MeshPhongMaterial({
+	color: 0xffffff,
+	specular: 0xffffff,
+	shininess: 5,
+	shading: THREE.FlatShading,
+	map: floorTexture
+	});
+
+
+	// Floor Geometry
+	var floorGeometry = new THREE.PlaneBufferGeometry(1000, 1000);
+	floor = new THREE.Mesh(floorGeometry, floorMaterial);
+	floor.rotation.x = -Math.PI / 2;
+
+	return floor;
+}
+
+module.exports = Floor;
+},{}],3:[function(require,module,exports){
+function Hand(camera){
+	/* HAND */
+	var handGeometry = new THREE.SphereGeometry(1, 32, 32 );
+	var handMaterial = new THREE.MeshBasicMaterial({color: "#eac086"});
+	hand = new THREE.Mesh(handGeometry, handMaterial);
+	hand.position.set(10, 6, camera.position.z / 2);
+
+	return hand;
+}
+
+module.exports = Hand;
+},{}],4:[function(require,module,exports){
+function Lightsaber(){
+	/* LIGHTSABER MODEL */
+	var lsGeometry = new THREE.CylinderGeometry(0.4, 0.04, 30, 20);
+	var lsMaterial = new THREE.MeshBasicMaterial({ color: "white" });
+	lightsaber = new THREE.Mesh( lsGeometry, lsMaterial );
+	lightsaber.position.setY(15);
+
+	var glowGeometry = new THREE.CylinderGeometry(0.5, 0.5, 30, 20);
+	var glowMaterial = new THREE.MeshBasicMaterial({transparent: true, opacity: 0.5, color: "#00FFFF" });
+	var glow = new THREE.Mesh(glowGeometry, glowMaterial);
+	lightsaber.add(glow);
+
+	return lightsaber;
+}
+
+module.exports = Lightsaber;
+},{}],5:[function(require,module,exports){
 /*
 	
 	2015 - Ajay Ramesh
@@ -272,3 +341,4 @@ socket.on('updateorientation', function(data){
 
 socket.on('updatemotion', function(data){
 });
+},{"../assets/Enemy":1,"../assets/Floor":2,"../assets/Hand":3,"../assets/Lightsaber":4}]},{},[5]);

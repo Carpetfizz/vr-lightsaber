@@ -34,15 +34,9 @@ socket.on('viewready', function(data){
 			beta.innerHTML = orientation.b;
 			gamma.innerHTML = orientation.g;
 			if(JSON.stringify(orientation) != JSON.stringify(oldOrientation)){
-				/*var a;
-				if(!oldOrientation.a) {
-					a = originalAlpha;
-				}else{
-					a = oldOrientation.a - orientation.a;
-				}
-				var calibratedOrientation = {g: orientation.g, b: orientation.b, a: a, o: orientation.o}*/
-				socket.emit('sendorientation', orientation);
-				oldOrientation = orientation;
+				var calibratedOrientation = {g: orientation.g, b: orientation.b, a: orientation.a - Math.abs(originalAlpha), o: orientation.o}
+				socket.emit('sendorientation', calibratedOrientation);
+				oldOrientation = calibratedOrientation;
 			}
 		});
 	}
