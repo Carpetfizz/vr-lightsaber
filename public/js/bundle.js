@@ -111,10 +111,10 @@ var scene,
 	floor;
 
 
-var Floor = require('../assets/Floor');
-var Hand = require('../assets/Hand');
-var Lightsaber = require('../assets/Lightsaber');
-var Enemy = require('../assets/Enemy');
+var Floor = require('../../assets/Floor');
+var Hand = require('../../assets/Hand');
+var Lightsaber = require('../../assets/Lightsaber');
+var Enemy = require('../../assets/Enemy');
 
 if (/Mobi/.test(navigator.userAgent)) {
    	isMobile = true;
@@ -341,4 +341,4 @@ socket.on('updateorientation', function(data){
 
 socket.on('updatemotion', function(data){
 });
-},{"../assets/Enemy":1,"../assets/Floor":2,"../assets/Hand":3,"../assets/Lightsaber":4}]},{},[5]);
+},{"../../assets/Enemy":1,"../../assets/Floor":2,"../../assets/Hand":3,"../../assets/Lightsaber":4}]},{},[5]);

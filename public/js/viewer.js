@@ -42,10 +42,10 @@ var scene,
 	floor;
 
 
-var Floor = require('../assets/Floor');
-var Hand = require('../assets/Hand');
-var Lightsaber = require('../assets/Lightsaber');
-var Enemy = require('../assets/Enemy');
+var Floor = require('../../assets/Floor');
+var Hand = require('../../assets/Hand');
+var Lightsaber = require('../../assets/Lightsaber');
+var Enemy = require('../../assets/Enemy');
 
 if (/Mobi/.test(navigator.userAgent)) {
    	isMobile = true;
