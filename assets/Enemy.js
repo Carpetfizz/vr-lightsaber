@@ -1,7 +1,9 @@
 function Enemy(){
-	var enemyGeometry = new THREE.SphereGeometry(2, 32, 32);
+	var enemyGeometry = new THREE.SphereGeometry(2, 40, 40);
 	var enemyMaterial = new THREE.MeshBasicMaterial({color: "red"});
-	enemy = new THREE.Mesh(enemyGeometry, enemyMaterial);
+
+	var enemy = new THREE.Mesh(enemyGeometry, enemyMaterial);
+
 	return enemy;
 }
 

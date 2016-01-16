@@ -10,19 +10,20 @@ function Floor(textureLoader, renderer) {
 
 	// Floor Material
 	var floorMaterial = new THREE.MeshPhongMaterial({
-	color: 0xffffff,
-	specular: 0xffffff,
-	shininess: 5,
-	shading: THREE.FlatShading,
-	map: floorTexture
+		color: 0xffffff,
+		specular: 0xffffff,
+		shininess: 5,
+		shading: THREE.FlatShading,
+		map: floorTexture
 	});
 
 
 	// Floor Geometry
-	var floorGeometry = new THREE.PlaneBufferGeometry(1000, 1000);
+	var floorGeometry = new THREE.PlaneGeometry(1000, 1000);
 	floor = new THREE.Mesh(floorGeometry, floorMaterial);
 	floor.rotation.x = -Math.PI / 2;
 
+	//return floor;
 	return floor;
 }
 

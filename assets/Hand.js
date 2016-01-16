@@ -4,6 +4,7 @@ function Hand(camera){
 	var handMaterial = new THREE.MeshBasicMaterial({color: "#eac086"});
 	hand = new THREE.Mesh(handGeometry, handMaterial);
 	hand.position.set(10, 6, camera.position.z / 2);
+	hand.mass = 0;
 
 	return hand;
 }
