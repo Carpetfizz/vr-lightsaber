@@ -1,6 +1,6 @@
 /*
 	
-	2015 - Ajay Ramesh
+	(December 2015 - January 2016) - Ajay Ramesh
 	ajayramesh@berkeley.edu
 	ajayramesh.com
 	@carpetfizz
@@ -9,9 +9,8 @@
 		- server.js "drake"
 		- stereo renderer
 		- click fullscreen
+		- legit deflection angles for Enemy
 		- Confirm button click
-		- gravity
-		- white screen of death
 
 	useful links:
 		- "What is Gimbal Lock and why does it occur?" http://www.anticz.com/eularqua.htm
@@ -33,7 +32,6 @@ var scene,
 	stereo,
 	clock,
 	textureLoader,
-	raycaster,
 	orbitControls,
 	controls,
 	container,
@@ -43,7 +41,6 @@ var scene,
 	enemies,
 	lightsaber,
 	floor,
-	collidableMeshList,
 	soundDir,
 	hitSounds;
 
@@ -52,6 +49,7 @@ var Floor = require('../../assets/Floor');
 var Hand = require('../../assets/Hand');
 var Lightsaber = require('../../assets/Lightsaber');
 var Enemy = require('../../assets/Enemy');
+var Utils = require('./utils');
 
 if (/Mobi/.test(navigator.userAgent)) {
    	isMobile = true;
@@ -67,7 +65,6 @@ function init(){
 	stereo = new THREE.StereoEffect(renderer);
 	clock = new THREE.Clock();
 	textureLoader = new THREE.TextureLoader();
-	raycaster = new THREE.Raycaster();
 	renderer.setSize( window.innerWidth, window.innerHeight);
 	camera.position.set(0, 15, 0);
 	
@@ -106,27 +103,31 @@ function init(){
 
 function setupScene(){
 
-	enemies = [];
-	collidableMeshList = [];
+	enemies = []; // Keep enemies in here so we can manipulate them in update()
+	collidableMeshList = []; // All meshes that the raycaster cares about
+	collidedMeshes = []; // All meshes that have already collided
 	
 	floor = new Floor(textureLoader, renderer);
 	scene.add(floor);
+
+	//Combound object from parent to child: Hand -> Lightsaber -> Glow
 
 	hand = new Hand(camera);
 	lightsaber = new Lightsaber();
 	hand.add(lightsaber);
 	scene.add(hand);
-	collidableMeshList.push(lightsaber);
+	Utils.collidableMeshList.push(lightsaber);
 
 	enemy = new Enemy();
 	
+	// Every 1.5 seconds, spawn a new enemy  at random position and set its velocity to -1, to come at the player
 	window.setInterval(function(){
 		var newEnemy = enemy.clone();
-		newEnemy.position.set(200, getRandomArbitrary(5, 20), getRandomArbitrary(-15, 15));
+		newEnemy.position.set(200, Utils.getRandomInRange(5, 20), Utils.getRandomInRange(-15, 15));
 		newEnemy.name = "enemy";
 		newEnemy.velocity = new THREE.Vector3(-1, 0, 0);
 		enemies.push(newEnemy);
-		collidableMeshList.push(newEnemy);
+		Utils.collidableMeshList.push(newEnemy);
 		scene.add(newEnemy);
 	}, 1500);
 
@@ -184,13 +185,12 @@ function setObjectQuat(object, data) {
 	betaMin = -Math.PI/6;
 
 	/*
+		- [BUG] beta jumps to 180 - theta or theta - 180
+		
 		x = rcos(theta)
 		y = rsin(theta)
 		beta - Math.PI/2 because we are still dealing with device in upright position
 		Added 10 to both to offset the hand in front of the camera
-	
-		- [BUG] beta jumps to 180 - theta or theta - 180
-
 		object.position.x = Math.cos(beta - Math.PI/2) + 10;
 		object.position.y = 5 * Math.sin(beta - Math.PI/2) + 10;
 	*/
@@ -198,16 +198,10 @@ function setObjectQuat(object, data) {
 	/*	beta - Math.PI/2 because rotations on z-axis are made when device is in upright position 
 		-gamma because of the way the lightsaber is facing the camera
 	*/
-
 	euler.set(0, -gamma, beta - Math.PI/2);
 	
 	/* Using quaternions to combat gimbal lock */ 
 	object.quaternion.setFromEuler(euler);	
-}
-
-/*https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random*/
-function getRandomArbitrary(min, max) {
-    return Math.random() * (max - min) + min;
 }
 
 /* RENDER */
@@ -239,6 +233,15 @@ function update(dt){
   camera.updateProjectionMatrix();
   orbitControls.update(dt);
   
+  // Check collision with lightsaber and enemy at every iteration
+  Utils.checkCollision(lightsaber.children[0], "enemy", true, function(result){
+  	if(result){
+  		result.velocity = new THREE.Vector3(1, 0, 0);
+  		Utils.playFile(soundDir, hitSounds[Math.floor(Utils.getRandomInRange(0, 3))]);		
+  	}
+  });
+
+  // Apply velocity vector to enemy, check if they are out of bounds to remove them
   for(var i=0; i<enemies.length; i++){
   	var e = enemies[i];
   	e.position.add(e.velocity);
@@ -248,8 +251,6 @@ function update(dt){
   	}
 
   }
-
-  checkCollision(lightsaber.children[0], "enemy");
 
   var cameraDirection = camera.getWorldDirection();
 
@@ -261,37 +262,7 @@ function update(dt){
   	controls.update();
   }
   oldCameraDirection = cameraDirection;
-}
 
-function checkCollision(object, targetName){
-
-	for (var vertexIndex = 0; vertexIndex < object.geometry.vertices.length; vertexIndex++)
-	{       
-	    var localVertex = object.geometry.vertices[vertexIndex].clone();
-	    var globalVertex = localVertex.applyMatrix4(object.matrixWorld)
-	    var directionVector = globalVertex.sub( object.position );
-
-	    raycaster.set( object.position, directionVector.clone().normalize() );
-	    
-	    var collisionResults = raycaster.intersectObjects( collidableMeshList );
-	    
-	    if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ) 
-	    {
-	    	var result = collisionResults[0].object;
-
-	    	if(result.name==targetName){
-	    		result.velocity = new THREE.Vector3(1, 0, 0);
-	    		playFile(hitSounds[Math.floor(getRandomArbitrary(0, 3))]);
-	    	}
-	    }
-	}
-
-}
-
-function playFile(file){
-	/* http://theforce.net/fanfilms/postproduction/soundfx/saberfx_fergo.asp */
-	var audio = new Audio(soundDir+file);
-	audio.play();
 }
 
 $(document).ready(function(){
