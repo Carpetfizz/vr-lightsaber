@@ -26,7 +26,7 @@ app.get('/lightsaber/:roomId', function (req, res){
 	res.render('lightsaber', {room: req.params.roomId});
 });
 
-var port = 3000;
+var port = process.env.PORT || 3000;
 server.listen(port, function(req, res){
 	console.log("Listening on "+port);
 });
