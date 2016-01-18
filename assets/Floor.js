@@ -19,7 +19,7 @@ function Floor(textureLoader, renderer) {
 
 
 	// Floor Geometry
-	var floorGeometry = new THREE.PlaneGeometry(1000, 1000);
+	var floorGeometry = new THREE.PlaneGeometry(500,500);
 	floor = new THREE.Mesh(floorGeometry, floorMaterial);
 	floor.rotation.x = -Math.PI / 2;
 

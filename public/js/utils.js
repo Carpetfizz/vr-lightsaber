@@ -1,7 +1,7 @@
 function Utils(){
 	this.raycaster = new THREE.Raycaster();
-	this.collidableMeshList = [];
-	this.collidedMeshes = [];
+	this.collidableMeshList = []; // All meshes raycaster cares about
+	this.collidedMeshes = []; // UUIDs of meshes that have already been collided with
 }
 
 Utils.prototype.getRandomInRange = function(min, max){
@@ -9,9 +9,7 @@ Utils.prototype.getRandomInRange = function(min, max){
 	return Math.random() * (max - min) + min;
 }
 
-Utils.prototype.playFile = function(directory, file){
-	/* http://theforce.net/fanfilms/postproduction/soundfx/saberfx_fergo.asp */
-	var audio = new Audio(directory+file);
+Utils.prototype.playAudio = function(audio){
 	audio.play();
 }
 
@@ -51,13 +49,41 @@ Utils.prototype.checkCollision = function(object, targetName, once, cb){
 		    				return;
 		    			}
 	    			}
-	    			collidedMeshes.push(result.uuid);
+	    			
+	    			this.collidedMeshes.push(result.uuid);
 	    		}
 	    		cb(result);
 	    	}
 	    }
 	}
 }
+
+Utils.prototype.cameraLookDir =  function(camera) {
+	/* http://stackoverflow.com/a/17286752/896112 */
+    var vector = new THREE.Vector3(0, 0, -1);
+    vector.applyEuler(camera.rotation, camera.rotation.order);
+    return vector;
+}
+
+Utils.prototype.debugAxes = function(axisLength, scene){
+    //Shorten the vertex function
+    function v(x,y,z){ 
+            return new THREE.Vector3(x,y,z); 
+    }
+    
+    //Create axis (point1, point2, colour)
+    function createAxis(p1, p2, color){
+            var line, lineGeometry = new THREE.Geometry(),
+            lineMat = new THREE.LineBasicMaterial({color: color, lineWidth: 1});
+            lineGeometry.vertices.push(p1, p2);
+            line = new THREE.Line(lineGeometry, lineMat);
+            scene.add(line);
+    }
+    
+    createAxis(v(-axisLength, 0, 0), v(axisLength, 0, 0), 0xFF0000);
+    createAxis(v(0, -axisLength, 0), v(0, axisLength, 0), 0x00FF00);
+    createAxis(v(0, 0, -axisLength), v(0, 0, axisLength), 0x0000FF);
+};
 
 var u = new Utils();
 

@@ -5,7 +5,6 @@ alpha = document.getElementById("alpha");
 beta = document.getElementById("beta");
 gamma = document.getElementById("gamma");
 
-
 socket.emit('lightsaberjoin', {room: roomId});
 
 socket.on('beginsetup', function(data){
@@ -40,16 +39,38 @@ socket.on('viewready', function(data){
 			}
 		});
 	}
+});
 
-	/*if(window.DeviceMotionEvent){
-		window.addEventListener('devicemotion', function(e){
-			var acceleration = e.acceleration;
-			var motion = {x: Math.round(acceleration.x), y: Math.round(acceleration.y), z: Math.round(acceleration.z)}
-			if(JSON.stringify(motion) != JSON.stringify(oldMotion)){
-				oldMotion = motion;
-				socket.emit('sendmotion', motion);
-			}
-		});
-	}*/
 
+var muted = true,
+	muteClass = "volume fa fa-volume-off",
+	volumeClass = "volume fa fa-volume-up",
+	volumeButton = document.getElementsByClassName("volume")[0],
+	audio = new Audio();
+	soundDir  = "/sounds/",
+	hitFiles = ["hit1.wav", "hit2.wav", "hit3.wav", "hit4.wav"],
+	hitSounds = [];
+
+volumeButton.addEventListener("click", function(){
+	if(muted){
+		volumeButton.className = volumeClass;
+		muted = false;
+	}	
+	changeAudio();
+});
+
+function changeAudio(){
+	if(!muted){
+		for(var i=0; i<hitFiles.length; i++){
+			var newAudio = document.createElement("AUDIO");
+			newAudio.id = "audio";
+			newAudio.src= soundDir+hitFiles[Math.floor(Math.random() * 3)];
+			newAudio.load();
+			hitSounds.push(newAudio);
+		}
+	}
+}
+
+socket.on('playsound', function(data){
+	hitSounds[Math.floor(Math.random() * 3)].play();
 });

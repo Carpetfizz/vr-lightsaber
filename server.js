@@ -3,23 +3,24 @@ var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
 var shortid = require('shortid');
-var googl = require('goo.gl');
+var Bitly = require('bitly');
 
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
 app.set('views', __dirname + '/views');
 
 var rooms = [];
+var bitly = new Bitly('e7d67277347e7c7b79b591cafa422a22e9a380fb');
 
 app.get('/', function (req, res) {
-	res.render('index');
-});
-
-app.get('/viewer', function (req, res){
 	//var room = shortid.generate();
 	var room = "drake";
+	bitly.shorten('https://'+req.headers.host+'/lightsaber/'+room). then(function(response){
+		res.render('viewer', {room: room, roomURL: response.data.url});
+	}, function(error){
+		throw error;
+	});
 	rooms.push(room);
-	res.render('viewer', {room: room});
 });
 
 app.get('/lightsaber/:roomId', function (req, res){
@@ -70,7 +71,7 @@ io.on('connection', function (socket) {
 		socket.broadcast.to(socket.room).emit('setupcomplete');
 
 		console.log("Lightsaber setup complete: "+socket.room);
-	})
+	});
 
 	socket.on('viewready', function(data){
 		socket.broadcast.to(socket.room).emit('viewready');
@@ -80,14 +81,10 @@ io.on('connection', function (socket) {
 
 	socket.on('sendorientation', function(data){
 		socket.broadcast.to(socket.room).emit('updateorientation',data);
-		console.log("Lightsaber Orientation Data \n");
-		console.log(data);
 	});
 
-	socket.on('sendmotion', function(data){
-		socket.broadcast.to(socket.room).emit('updatemotion',data);
-		console.log("Lightsaber Motion Data \n");
-		console.log(data);
+	socket.on('sendhit', function(data){
+		socket.broadcast.to(socket.room).emit('playsound', data);
 	});
 
 });
