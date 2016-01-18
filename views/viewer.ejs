@@ -48,14 +48,16 @@
 				background-color: black;
 			}
 			.confirm-button {
-				width: 100%;
-				height: 100px;
+				width: auto;
+				height: auto;
 				color: white;
 				background-color: #2ecc71;
 				display: none;
+				margin: 10px;
 			}
 			.confirm-button span {
-				font-size: 24px;
+				padding: 10px;
+				font-size: 18px;
 			}
 			.landing {
 			  display: flex;
@@ -83,8 +85,8 @@
 				<center><span id="room-url"><%= roomURL %></span></center>
 
 				<center><div class="confirm-button">
-					<span>Connected! <br>
-					Rotate your device, <b>press this button</b>, and slide it into Google Cardboard</span>
+					<span> Connected! </span><br>
+					<span> Please rotate your device <br><b> Press this button </b></br> and slide it into Cardboard</span>
 				</div></center>
 
 				<h3> What is this? </h3>
@@ -99,7 +101,7 @@
 					First get two smartphones which have the latest versions of Safari or Google Chrome. Choose one to use as the Viewer and one to use as the Lightsaber. Open this website on the Viewer device, and you will see a shortlink above. Open the shortlink on the Lightsaber device, and you will see a button appear on the Viewer device. Turn the Viewer sideways, press the button, and insert it into your Google Cardboard. The phone acting as the Lightsaber will control a 3D rendered Lightsaber on the Viewer. Deflect some laser ball things. 
 				</p>
 
-				<h3> What technologies were used? </h3>
+				<h3> What technologies are used? </h3>
 
 				<p>
 					Both components of this experiment, the Lightsaber and the Viewer, run on the web. They use the latest HTML5 technologies as well as some modern backends. Below is a list of some of the main parts of this application.

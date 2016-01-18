@@ -333,7 +333,7 @@ function init(){
 	$('.landing').hide();
 	$('.confirm-button').hide();
 	container.appendChild(domElement);
-	//domElement.addEventListener('click', fullscreen, false);
+	domElement.addEventListener('click', fullscreen, false);
 	setupScene();
 }
 
@@ -507,11 +507,10 @@ function update(dt){
 }
 
 $(document).ready(function(){
-	/*$('.confirm-button').click(function(){
+	$('.confirm-button').click(function(){
 		init();
 		animate();
-	});*/
-	init();
+	});
 });
 
 /* SOCKET.IO */

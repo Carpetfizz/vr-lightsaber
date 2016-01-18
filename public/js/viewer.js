@@ -6,8 +6,7 @@
 	@carpetfizz
 
 	//TODO:
-		- server.js "drake"
-		- Confirm button click
+		- Done for now
 
 	useful links:
 		- "What is Gimbal Lock and why does it occur?" http://www.anticz.com/eularqua.htm
@@ -93,7 +92,7 @@ function init(){
 	$('.landing').hide();
 	$('.confirm-button').hide();
 	container.appendChild(domElement);
-	//domElement.addEventListener('click', fullscreen, false);
+	domElement.addEventListener('click', fullscreen, false);
 	setupScene();
 }
 
@@ -267,11 +266,10 @@ function update(dt){
 }
 
 $(document).ready(function(){
-	/*$('.confirm-button').click(function(){
+	$('.confirm-button').click(function(){
 		init();
 		animate();
-	});*/
-	init();
+	});
 });
 
 /* SOCKET.IO */
