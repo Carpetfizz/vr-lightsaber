@@ -46,7 +46,7 @@ In order to run and build this project you will need [Node.js](https://nodejs.or
 
 4. `ngrok http 3000` will start a secure tunnel to your localhost. Navigate to the `Forwarding` URL
 
-# Contributing
+# Building
 
 If you'd like to help make this more awesome please feel free to contribute! The only real dev dependency is [browserify](http://browserify.org/) or [watchify](https://github.com/substack/watchify) which I use to bundle the modules.
 
