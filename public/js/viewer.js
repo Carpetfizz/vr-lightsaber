@@ -134,7 +134,7 @@ function setupScene(){
 function setupGame() {
 	scene.add(hand);
 	enemy = new Enemy();
-	
+	window.addEventListener('deviceorientation', setOrientationControls, true);
 	// Every 1.5 seconds, spawn a new enemy  at random position and set its velocity to -1, to come at the player
 	window.setInterval(function(){
 		var newEnemy = enemy.clone();
@@ -169,8 +169,6 @@ function setOrientationControls(e){
   controls.update();
   window.removeEventListener('deviceorientation', setOrientationControls, true);
 }
-
-window.addEventListener('deviceorientation', setOrientationControls, true);
 
 /* UTILS */
 function setObjectQuat(object, data) {
