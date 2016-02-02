@@ -6,6 +6,8 @@ It's being hosted on Heroku free tier which only stays up for 18 hours a day - t
 
 [http://vrlightsaber.herokuapp.com/](http://vrlightsaber.herokuapp.com/)
 
+[![vr-lightsaber](http://img.youtube.com/vi/J9cgO_PlvuE/0.jpg)](http://www.youtube.com/watch?v=J9cgO_PlvuE)
+
 ## What is this?
 
 This experiment was inspired by [lightsaber.withgoogle.com](lightsaber.withgoogle.com), but takes the idea a step further. You will be able to use one smartphone as a control for the lightsaber and the other one to view the immersive VR experience with Google Cardboard. It all runs on a webkit enabled browser such as Safari or Chrome. I'm using free hosting for a rather high bandwidth application so you may notice significant delays. For the best experience, follow the instructions on Github to get the app running locally on your machine.
